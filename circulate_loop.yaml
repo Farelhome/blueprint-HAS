@@ -1,0 +1,64 @@
+blueprint:
+  name: Sirkulasi ON/OFF Loop Otomatis
+  description: Nyalakan perangkat selama X menit, matikan selama Y menit, berulang terus
+  domain: automation
+  input:
+    target_entity:
+      name: Entitas Target
+      description: Perangkat yang akan dinyalakan/dimatikan
+      selector:
+        entity:
+          domain: switch
+    on_duration:
+      name: Durasi ON (menit)
+      description: Berapa menit perangkat menyala
+      default: 60
+      selector:
+        number:
+          min: 1
+          max: 240
+          unit_of_measurement: minutes
+          mode: slider
+    off_duration:
+      name: Durasi OFF (menit)
+      description: Berapa menit perangkat mati
+      default: 60
+      selector:
+        number:
+          min: 1
+          max: 240
+          unit_of_measurement: minutes
+          mode: slider
+    enable_boolean:
+      name: Toggle Kontrol
+      description: Input_boolean untuk mengaktifkan/mematikan loop
+      selector:
+        entity:
+          domain: input_boolean
+
+mode: single
+
+trigger:
+  - platform: state
+    entity_id: !input enable_boolean
+    to: "on"
+
+condition: []
+
+action:
+  - repeat:
+      while:
+        - condition: state
+          entity_id: !input enable_boolean
+          state: "on"
+      sequence:
+        - service: switch.turn_on
+          target:
+            entity_id: !input target_entity
+        - delay:
+            minutes: !input on_duration
+        - service: switch.turn_off
+          target:
+            entity_id: !input target_entity
+        - delay:
+            minutes: !input off_duration
