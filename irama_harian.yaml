@@ -1,0 +1,152 @@
+blueprint:
+  name: Irama Harian Lampu Otomatis
+  description: Sesuaikan pencahayaan lampu sesuai waktu (pagi, siang, sore, malam) seperti fitur IRAMA pada Philips WiZ.
+  domain: automation
+  input:
+    target_light:
+      name: Lampu Target
+      selector:
+        entity:
+          domain: light
+
+    pagi_time:
+      name: Waktu Pagi
+      default: "06:00:00"
+      selector:
+        time:
+    pagi_brightness:
+      name: Brightness Pagi
+      default: 255
+      selector:
+        number:
+          min: 1
+          max: 255
+    pagi_color_temp:
+      name: Warna Pagi (color_temp)
+      default: 300
+      selector:
+        number:
+          min: 153
+          max: 500
+
+    siang_time:
+      name: Waktu Siang
+      default: "12:00:00"
+      selector:
+        time:
+    siang_brightness:
+      name: Brightness Siang
+      default: 255
+      selector:
+        number:
+          min: 1
+          max: 255
+    siang_color_temp:
+      name: Warna Siang (color_temp)
+      default: 250
+      selector:
+        number:
+          min: 153
+          max: 500
+
+    sore_time:
+      name: Waktu Sore
+      default: "17:30:00"
+      selector:
+        time:
+    sore_brightness:
+      name: Brightness Sore
+      default: 180
+      selector:
+        number:
+          min: 1
+          max: 255
+    sore_color_temp:
+      name: Warna Sore (color_temp)
+      default: 370
+      selector:
+        number:
+          min: 153
+          max: 500
+
+    malam_time:
+      name: Waktu Malam
+      default: "21:00:00"
+      selector:
+        time:
+    malam_brightness:
+      name: Brightness Malam
+      default: 50
+      selector:
+        number:
+          min: 1
+          max: 255
+    malam_color_temp:
+      name: Warna Malam (color_temp)
+      default: 450
+      selector:
+        number:
+          min: 153
+          max: 500
+
+trigger:
+  - platform: time
+    at: !input pagi_time
+    id: pagi
+  - platform: time
+    at: !input siang_time
+    id: siang
+  - platform: time
+    at: !input sore_time
+    id: sore
+  - platform: time
+    at: !input malam_time
+    id: malam
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: pagi
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input target_light
+            data:
+              brightness: !input pagi_brightness
+              color_temp: !input pagi_color_temp
+
+      - conditions:
+          - condition: trigger
+            id: siang
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input target_light
+            data:
+              brightness: !input siang_brightness
+              color_temp: !input siang_color_temp
+
+      - conditions:
+          - condition: trigger
+            id: sore
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input target_light
+            data:
+              brightness: !input sore_brightness
+              color_temp: !input sore_color_temp
+
+      - conditions:
+          - condition: trigger
+            id: malam
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: !input target_light
+            data:
+              brightness: !input malam_brightness
+              color_temp: !input malam_color_temp
+
+mode: single
